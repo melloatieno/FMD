@@ -8,6 +8,7 @@ import {
   Text,
   TouchableOpacity
 } from "react-native";
+import axios from 'axios';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 
 function PhotoScreen({ navigation }) {
@@ -37,12 +38,37 @@ function PhotoScreen({ navigation }) {
         mediaType: 'photo',
       };
       try {
-        const result = await launchImageLibrary(options);
+        // const result = await launchImageLibrary(options);
         if (result.assets && result.assets.length > 0) {
           const source = { uri: result.assets[0].uri };
-          console.log(source);
+          console.log(result.assets[0]);
           // Navigate to the next screen with the image URI
-          navigation.navigate('ImageUpload', { imageUri: source.uri });
+          // navigation.navigate('ImageUpload', { imageUri: source.uri });
+          const formData = new FormData();
+        formData.append('image', result.assets[0]);
+
+        try {
+          const response = await axios({
+            
+            method: 'post',
+            url: 'http://localhost:8080/diagnosis/upload',
+            data: formData,
+            headers: { 'Content-Type': 'multipart/form-data',
+            "Access-Control-Allow-Origin": "**" },
+          });
+
+          console.log(response.data);
+          let responseJson = await response.json();
+
+          if (responseJson.result === "Fmd Found") {
+            navigation.navigate('Results'); 
+          } else {
+            navigation.navigate('ResultsNegative'); 
+          }
+
+        } catch (error) {
+          console.error("Error uploading image:", error);
+        }
         } else {
           console.log('User cancelled image picker');
         }
@@ -102,6 +128,7 @@ function PhotoScreen({ navigation }) {
       </View>
       <View style={styles.view14}>
       <TouchableOpacity style={styles.view14} onPress={openGallery}>
+        <form ><input type="file" onClick={handleclick}/></form>
         <Text style={{ color: '#FFF', textAlign: 'center', fontSize: 20 }}>Choose From Gallery</Text>
       </TouchableOpacity>
       </View>

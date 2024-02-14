@@ -6,50 +6,43 @@ import {
   Text,
   TouchableOpacity,
 } from "react-native";
+import axios from 'axios';
 
 
-function ImageUploadScreen({ route, navigation }) {
+function ImageUploadScreen() {
 
   // const [ setImageUri] = useState(null);
-  const { imageUri } = route.params;
+  // const { imageUri } = route.params;
+  // const formattedUri = imageUri.startsWith('file://') ? imageUri : `file://${imageUri}`;
+  // const sendImageToApi = async () => {
+  //   const formData = new FormData();
+  //   formData.append('image', {
+  //     uri: formattedUri,
+  //     name: 'upload.jpg', 
+  //     type: 'image/jpeg', 
+  //   });
 
-  const sendImageToApi = async () => {
-    // Extracting file name and type from the URI
-    let uriParts = imageUri.split('/');
-    let fileName = uriParts[uriParts.length - 1];
-    let fileType = fileName.split('.')[1];
+  //   try {
+  //     const response = await axios({
+  //       method: 'post',
+  //       url: 'http://localhost:8080/diagnosis/upload',
+  //       data: formData,
+  //       headers: { 'Content-Type': 'multipart/form-data' },
+  //     });
 
-    let formData = new FormData();
-    formData.append('image', {
-      uri: imageUri,
-      name: fileName,
-      type: `image/${fileType}`,
-    });
-    
-    
+  //     console.log(response.data);
+  //     let responseJson = await response.json();
 
-    try {
-      let response = await fetch('http://localhost:8080/diagnosis/upload', {
-        method: 'POST',
-        body: formData,
-        headers: {
-          // 'Content-Type': 'multipart/form-data',
-        }        
-      });
+  //     if (responseJson.result === "Fmd Found") {
+  //       navigation.navigate('Results'); 
+  //     } else {
+  //       navigation.navigate('ResultsNegative'); 
+  //     }
 
-      console.log(formData.has('image')); // Should log true if 'image' is appended
-
-      let responseJson = await response.json();
-      // Adapt response handling based on the actual structure of the response you get from your Spring Boot application
-      if (responseJson.result === "Fmd Found") {
-        navigation.navigate('Results');
-      } else {
-        navigation.navigate('ResultsNegative');
-      }
-    } catch (error) {
-      console.error("Error uploading image:", error);
-    }
-  };
+  //   } catch (error) {
+  //     console.error("Error uploading image:", error);
+  //   }
+  // };
   
   return (
     <View style={styles.view1}>
