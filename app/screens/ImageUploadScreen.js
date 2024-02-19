@@ -11,38 +11,31 @@ import axios from 'axios';
 
 function ImageUploadScreen() {
 
-  // const [ setImageUri] = useState(null);
-  // const { imageUri } = route.params;
-  // const formattedUri = imageUri.startsWith('file://') ? imageUri : `file://${imageUri}`;
-  // const sendImageToApi = async () => {
-  //   const formData = new FormData();
-  //   formData.append('image', {
-  //     uri: formattedUri,
-  //     name: 'upload.jpg', 
-  //     type: 'image/jpeg', 
-  //   });
+  const { selectedFile } = route.params;
+  const sendImageToApi = async () => {
+    const formData = new FormData();
+    // Append the selected file to formData; make sure you have the correct file structure
+    formData.append('image', {
+      uri: selectedFile.uri,
+      name: selectedFile.name || 'upload.jpg', 
+      type: selectedFile.type || 'image/jpeg', 
+    });
 
-  //   try {
-  //     const response = await axios({
-  //       method: 'post',
-  //       url: 'http://localhost:8080/diagnosis/upload',
-  //       data: formData,
-  //       headers: { 'Content-Type': 'multipart/form-data' },
-  //     });
+    try {
+      const response = await axios.post('http://localhost:8080/diagnosis/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
 
-  //     console.log(response.data);
-  //     let responseJson = await response.json();
-
-  //     if (responseJson.result === "Fmd Found") {
-  //       navigation.navigate('Results'); 
-  //     } else {
-  //       navigation.navigate('ResultsNegative'); 
-  //     }
-
-  //   } catch (error) {
-  //     console.error("Error uploading image:", error);
-  //   }
-  // };
+      if (response.data.result === "Fmd Found") {
+        navigation.navigate('Results');
+      } else {
+        navigation.navigate('ResultsNegative');
+      }
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      Alert.alert("Upload failed", "Failed to upload image. Please try again.");
+    }
+  };
   
   return (
     <View style={styles.view1}>
@@ -63,7 +56,11 @@ function ImageUploadScreen() {
           <Text>Guardians of Well-Being: Snap, Analyze, Heal.</Text>
         </View>
       </View>
-        <Image source={{ uri: imageUri }} style={{ width: 200, height: 200 }} />
+      {imageBase64 ? (
+        <Image source={{ uri: selectedFile }} style={{ width: 200, height: 200 }} />
+      ) : (
+        <Text>No Image Selected</Text>
+      )}
       <View style={styles.view10}>
         <TouchableOpacity style={styles.view15} onPress={sendImageToApi}>
           <Text style={{color: '#FFF', textAlign: 'center', fontSize: 20}}>Scan Photo</Text>
