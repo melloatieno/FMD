@@ -1,42 +1,37 @@
 import * as React from "react";
-import {
-  View,
-  StyleSheet,
-  Image,
-  Text,
-  TouchableOpacity,
-} from "react-native";
-import axios from 'axios';
+import { View, StyleSheet, Image, Text, TouchableOpacity } from "react-native";
+import axios from "axios";
 
-
-function ImageUploadScreen() {
-
-  const { selectedFile } = route.params;
+function ImageUploadScreen({ route, navigation }) {
+  const { imageUri } = route.params;
   const sendImageToApi = async () => {
     const formData = new FormData();
-    // Append the selected file to formData; make sure you have the correct file structure
-    formData.append('image', {
-      uri: selectedFile.uri,
-      name: selectedFile.name || 'upload.jpg', 
-      type: selectedFile.type || 'image/jpeg', 
-    });
-
     try {
-      const response = await axios.post('http://localhost:8080/diagnosis/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      const resp = await fetch(imageUri);
+      const blob = await resp.blob();
+      formData.append("image", blob);
+      const response = await axios.post(
+        "http://localhost:8080/diagnosis/upload",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Accept: "application/json",
+          },
+        }
+      );
 
       if (response.data.result === "Fmd Found") {
-        navigation.navigate('Results');
+        navigation.navigate("Results");
       } else {
-        navigation.navigate('ResultsNegative');
+        navigation.navigate("ResultsNegative");
       }
     } catch (error) {
       console.error("Error uploading image:", error);
       Alert.alert("Upload failed", "Failed to upload image. Please try again.");
     }
   };
-  
+
   return (
     <View style={styles.view1}>
       <View style={styles.view2}>
@@ -56,14 +51,14 @@ function ImageUploadScreen() {
           <Text>Guardians of Well-Being: Snap, Analyze, Heal.</Text>
         </View>
       </View>
-      {imageBase64 ? (
-        <Image source={{ uri: selectedFile }} style={{ width: 200, height: 200 }} />
-      ) : (
-        <Text>No Image Selected</Text>
-      )}
+
+      <Image source={{ uri: imageUri }} style={{ width: 200, height: 200 }} />
+
       <View style={styles.view10}>
         <TouchableOpacity style={styles.view15} onPress={sendImageToApi}>
-          <Text style={{color: '#FFF', textAlign: 'center', fontSize: 20}}>Scan Photo</Text>
+          <Text style={{ color: "#FFF", textAlign: "center", fontSize: 20 }}>
+            Scan Photo
+          </Text>
         </TouchableOpacity>
       </View>
       <Image
@@ -89,41 +84,41 @@ function ImageUploadScreen() {
 }
 
 const styles = StyleSheet.create({
-    view1: {
-        borderRadius: 40,
-        backgroundColor: "#FFF",
-        display: "flex",
-        maxWidth: 414,
-        paddingBottom: 22,
-        paddingTop: 20,
-        flexDirection: "column",
-        alignItems: "center",
-      },
-      view2: {
-        borderRadius: 40,
-        backgroundColor: "#454B1B",
-        alignSelf: "stretch",
-        display: "flex",
-        width: "100%",
-        alignItems: "stretch",
-        justifyContent: "space-between",
-        gap: 20,
-        padding: "33px 50px",
-      },
-      view3: {
-        color: "#FFF",
-        font: "700 16px ",
-        paddingLeft: 20,
-        paddingTop: 20,
-      },
-      view4: {
-        alignItems: "stretch",
-        alignSelf: "start",
-        display: "flex",
-        marginTop: 4,
-        flexDirection: "column",
-        padding: "2px 0",
-      },
+  view1: {
+    borderRadius: 40,
+    backgroundColor: "#FFF",
+    display: "flex",
+    maxWidth: 414,
+    paddingBottom: 22,
+    paddingTop: 20,
+    flexDirection: "column",
+    alignItems: "center",
+  },
+  view2: {
+    borderRadius: 40,
+    backgroundColor: "#454B1B",
+    alignSelf: "stretch",
+    display: "flex",
+    width: "100%",
+    alignItems: "stretch",
+    justifyContent: "space-between",
+    gap: 20,
+    padding: "33px 50px",
+  },
+  view3: {
+    color: "#FFF",
+    font: "700 16px ",
+    paddingLeft: 20,
+    paddingTop: 20,
+  },
+  view4: {
+    alignItems: "stretch",
+    alignSelf: "start",
+    display: "flex",
+    marginTop: 4,
+    flexDirection: "column",
+    padding: "2px 0",
+  },
   view5: { backgroundColor: "#FFF", flexShrink: 0, height: 1 },
   view6: {
     background:

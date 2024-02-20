@@ -1,105 +1,50 @@
 import * as React from "react";
-import {
-  View,
-  StyleSheet,
-  Image,
-  Text,
-  TouchableOpacity
-} from "react-native";
+import { View, StyleSheet, Image, Text, TouchableOpacity } from "react-native";
 
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
-import { readFile } from 'react-native-fs';
+import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 
 function PhotoScreen({ navigation }) {
-
-  // function generateFilename(mimeType) {
-  //   const timestamp = Date.now();
-  //   let fileExtension = 'jpg'; 
-  //   if (mimeType) {
-  //     const mimeParts = mimeType.split('/');
-  //     if (mimeParts.length > 1) {
-  //       fileExtension = mimeParts[1] === 'jpeg' ? 'jpg' : mimeParts[1];
-  //     }
-  //   }
-  //   return `image-${timestamp}.${fileExtension}`;
-  // }
-  
-
-    const openCamera = async () => {
-      const options = {
-        saveToPhotos: true,
-        mediaType: 'photo',
-        includeBase64: true,
-      };
-      try {
-        const result = await launchCamera(options);
-        if (result.assets && result.assets.length > 0) {
-          const source = { uri: result.assets[0].uri };
-          console.log(source);
-          // Navigate to the next screen with the image URI
-          navigation.navigate('ImageUpload', { imageUri: source.uri });
-        } else {
-          console.log('User cancelled image picker');
-        }
-      } catch (error) {
-        console.log('ImagePicker Error: ', error);
-      }
+  const openCamera = async () => {
+    const options = {
+      saveToPhotos: true,
+      mediaType: "photo",
+      includeBase64: true,
     };
-
-    const loadImageBase64 = async (capturedImageURI) => {
-      try {
-        const base64Data = await readFile(capturedImageURI, 'base64');
-        return 'data:image/jpeg;base64,' + base64Data;
-      } catch (error) {
-        console.error('Error converting image to base64:', error);
-      }
-    };
-  
-    const openGallery = async () => {
-      const options = { maxHeight: 200, maxWidth: 200, selectionLimit: 1, mediaType: 'photo', includeBase64: false };
-      const result = await launchImageLibrary(options);
-    
-      console.log(result);
+    try {
+      const result = await launchCamera(options);
       if (result.assets && result.assets.length > 0) {
-        const asset = result.assets[0];
-        let fileName = result.assets[0].fileName || `temp_${Date.now()}.jpg`;
-
-        console.log(asset);
-        
-    
-        const formData = new FormData();
-        // formData.append('image', {
-        //   uri: asset.uri,
-        //   type: asset.type || 'image/jpeg',
-        //   name: fileName,
-        // });
-        const base64Image = await loadImageBase64 ( asset.uri ); 
-        formData.append('image', base64Image);
-    
-        console.log(formData);
-
-        try {
-          let res = await fetch(
-            'http://localhost:8080/diagnosis/upload',
-            {
-              method: 'post',
-              body: formData,
-              // headers: {
-              //   'Content-Type': 'multipart/form-data',
-              // }
-            }
-          );
-          let responseJson = await res.json();
-          console.log(responseJson, "responseJson");
-        } catch (error) {
-          console.error("Upload error", error);
-        }
+        const source = { uri: result.assets[0].uri };
+        console.log(source);
+        // Navigate to the next screen with the image URI
+        navigation.navigate("ImageUpload", { imageUri: source.uri });
       } else {
-        console.log('No assets');
+        console.log("User cancelled image picker");
       }
-    };
+    } catch (error) {
+      console.log("ImagePicker Error: ", error);
+    }
+  };
 
-      
+  const openGallery = async () => {
+    const options = {
+      maxHeight: 200,
+      maxWidth: 200,
+      selectionLimit: 1,
+      mediaType: "photo",
+      includeBase64: false,
+    };
+    const result = await launchImageLibrary(options);
+
+    console.log(result);
+    if (result.assets && result.assets.length > 0) {
+      const asset = result.assets[0];
+
+      navigation.navigate("ImageUpload", { imageUri: asset.uri });
+    } else {
+      console.log("No assets");
+    }
+  };
+
   return (
     <View style={styles.view1}>
       <View style={styles.view2}>
@@ -145,14 +90,18 @@ function PhotoScreen({ navigation }) {
         <Text>Take Photo</Text>
       </View> */}
       <View style={styles.view14}>
-      <TouchableOpacity style={styles.view14} onPress={openCamera}>
-        <Text style={{ color: '#FFF', textAlign: 'center', fontSize: 20 }}>Take Photo</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.view14} onPress={openCamera}>
+          <Text style={{ color: "#FFF", textAlign: "center", fontSize: 20 }}>
+            Take Photo
+          </Text>
+        </TouchableOpacity>
       </View>
       <View style={styles.view14}>
-      <TouchableOpacity style={styles.view14} onPress={openGallery}>
-        <Text style={{ color: '#FFF', textAlign: 'center', fontSize: 20 }}>Choose From Gallery</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.view14} onPress={openGallery}>
+          <Text style={{ color: "#FFF", textAlign: "center", fontSize: 20 }}>
+            Choose From Gallery
+          </Text>
+        </TouchableOpacity>
       </View>
       <Image
         resizeMode="contain"
